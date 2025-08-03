@@ -13,7 +13,39 @@ import uuid
 
 @app.route("/")
 def home_page():
-    return "Welcome!"
+    return """
+    <html>
+      <head>
+        <title>Inkomoko Auth API</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 2rem; background-color: #f8f9fa; }
+          h1 { color: #333; }
+          ul { padding-left: 1rem; }
+          li { margin-bottom: 0.5rem; }
+          code { background-color: #eee; padding: 2px 4px; border-radius: 3px; }
+        </style>
+      </head>
+      <body>
+        <h1>Welcome to the Inkomoko Auth API</h1>
+        <p>This is a lightweight authentication and organisation management API built with Flask and PostgreSQL.</p>
+        <p>It supports user registration, login, JWT-based authentication, and basic organisation management.</p>
+
+        <h2>Available Endpoints</h2>
+        <ul>
+          <li><strong>POST</strong> <code>/auth/register</code> - Register a new user and create default organisation</li>
+          <li><strong>POST</strong> <code>/auth/login</code> - Log in and receive JWT token</li>
+          <li><strong>GET</strong> <code>/api/users/&lt;userId&gt;</code> - Retrieve user profile</li>
+          <li><strong>GET</strong> <code>/api/organisations</code> - List user’s organisations <em>(JWT required)</em></li>
+          <li><strong>GET</strong> <code>/api/organisations/&lt;orgId&gt;</code> - Get organisation details <em>(JWT required)</em></li>
+          <li><strong>POST</strong> <code>/api/organisations</code> - Create new organisation <em>(JWT required)</em></li>
+          <li><strong>POST</strong> <code>/api/organisations/&lt;orgId&gt;/users</code> - Add user to organisation</li>
+        </ul>
+
+        <p>For full documentation, visit the <code>README.md</code> in the repo.</p>
+      </body>
+    </html>
+    """
+
 
 # Function to add errors to a list
 def add_error_to_list(errors_list, field, message):

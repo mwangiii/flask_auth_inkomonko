@@ -1,9 +1,5 @@
-# BACKEND Stage 2 Task: User Authentication & Organisation
-Using your most comfortable backend framework of your choice, adhere to the following acceptance:  
-**READ CAREFULLY!!!**  
-Acceptance Criteria  
-Connect your application to a Postgres database server. (optional: you can choose to use any ORM of your choice if you want or not).  
-
+# Inkomoko Auth Api
+This is a lightweight authentication and organisation management API built with Flask and PostgreSQL. It supports user registration, login, JWT-based authentication, and basic organisation CRUD operations.
 ## CREATING A USER
 ###  Create a User model using the properties below
 _NB: user id and email must be unique_

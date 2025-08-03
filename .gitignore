@@ -1,0 +1,42 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Environment variables and secrets
+.env
+*.ini
+*.pem
+
+# Docker files
+*.log
+*.pid
+*.db
+*.sqlite3
+docker-compose.override.yml
+
+# Virtual environments
+venv/
+env/
+.venv/
+.python-version
+
+# Editor/project files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+.DS_Store
+
+# Test and coverage output
+htmlcov/
+coverage.xml
+*.cover
+.pytest_cache/
+tests/__pycache__/
+
+# Jupyter and IPython stuff
+.ipynb_checkpoints/
+
