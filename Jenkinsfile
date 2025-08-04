@@ -12,10 +12,10 @@ pipeline {
       }
       steps {
         echo "Cleaning up previous Docker containers..."
-        sh """
+        sh '''
           docker-compose down --remove-orphans || true
-          docker system prune -f || true
-        """
+          docker system prune -f -a --volumes || true
+        '''
       }
     }
 
@@ -31,8 +31,16 @@ pipeline {
         branch 'main'
       }
       steps {
-        echo "Renaming environments -> .env"
-        sh "mv environments .env || true"
+        echo "Renaming 'environments' to '.env'..."
+        sh '''
+          if [ -f environments ]; then
+            mv environments .env
+            echo ".env file prepared."
+          else
+            echo "environments file not found!"
+            exit 1
+          fi
+        '''
       }
     }
 
