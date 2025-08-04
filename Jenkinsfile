@@ -3,6 +3,7 @@ pipeline {
 
   environment {
     COMPOSE_PROJECT_NAME = "flask_auth_inkomonko"
+    PROMETHEUS_HOST = "http://51.21.128.35:9090"
   }
 
   stages {
@@ -43,14 +44,14 @@ pipeline {
         '''
       }
     }
-    
+
     stage('Tests (Skipped)') {
       steps {
         echo "Skipping tests for now..."
         sh 'echo "tests would run here"'
       }
     }
-    
+
     stage('Build and Start with Docker Compose') {
       when {
         branch 'main'
@@ -58,6 +59,19 @@ pipeline {
       steps {
         echo "Building and starting containers with Docker Compose..."
         sh "docker-compose up -d --build"
+      }
+    }
+
+    stage('Prometheus Health Check') {
+      when {
+        branch 'main'
+      }
+      steps {
+        echo "Querying Prometheus for application health..."
+        sh '''
+          RESPONSE=$(curl -s "${PROMETHEUS_HOST}/api/v1/query?query=up")
+          echo "$RESPONSE" | grep '"value"' | grep '"1"' > /dev/null
+        '''
       }
     }
   }
