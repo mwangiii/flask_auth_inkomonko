@@ -43,7 +43,14 @@ pipeline {
         '''
       }
     }
-
+    
+    stage('Tests (Skipped)') {
+      steps {
+        echo "Skipping tests for now..."
+        sh 'echo "tests would run here"'
+      }
+    }
+    
     stage('Build and Start with Docker Compose') {
       when {
         branch 'main'
