@@ -35,6 +35,7 @@ def create_app():
 
     # Initialize Prometheus metrics (pass app directly for older version)
     PrometheusMetrics(app)
+    print("✅ PrometheusMetrics initialized")
 
     # Create all tables
     with app.app_context():
