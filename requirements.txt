@@ -8,4 +8,4 @@ SQLAlchemy==1.4.45
 gunicorn==20.1.0
 Werkzeug==2.2.3
 psycopg2-binary==2.9.9
-prometheus-flask-exporter
+prometheus_flask_exporter>=0.20.0

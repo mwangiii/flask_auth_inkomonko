@@ -6,16 +6,14 @@ from config import config
 from prometheus_flask_exporter import PrometheusMetrics
 import os
 
-# Initialize extensions
 db = SQLAlchemy()
 jwt = JWTManager()
 migrate = Migrate()
-metrics = PrometheusMetrics()  
 
 def create_app():
     app = Flask(__name__)
 
-    # Load DB config from environment
+    # Load config
     db_params = config()
     app.config['SQLALCHEMY_DATABASE_URI'] = (
         f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
@@ -35,10 +33,10 @@ def create_app():
     from app.routes import register_routes
     register_routes(app)
 
-    # Register Prometheus metrics route AFTER routes are set up
-    metrics.init_app(app)
+    # Initialize Prometheus metrics (pass app directly for older version)
+    PrometheusMetrics(app)
 
-    # Create tables if they don’t exist
+    # Create all tables
     with app.app_context():
         db.create_all()
 
