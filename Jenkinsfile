@@ -8,6 +8,17 @@ pipeline {
 
   stages {
 
+    stage('Set Compose Command') {
+      steps {
+        script {
+          // Check if 'docker compose' works; fallback to 'docker-compose'
+          def result = sh(script: 'docker compose version > /dev/null 2>&1', returnStatus: true)
+          env.DOCKER_COMPOSE_CMD = (result == 0) ? 'docker compose' : 'docker-compose'
+          echo "Using: ${env.DOCKER_COMPOSE_CMD}"
+        }
+      }
+    }
+
     stage('Initial Cleanup') {
       when {
         branch 'main'
@@ -15,7 +26,7 @@ pipeline {
       steps {
         echo "Cleaning up previous Docker containers..."
         sh '''
-          docker-compose down --remove-orphans || true
+          ${DOCKER_COMPOSE_CMD} down --remove-orphans || true
           docker system prune -f -a --volumes || true
         '''
       }
@@ -59,7 +70,7 @@ pipeline {
       }
       steps {
         echo "Building and starting containers with Docker Compose..."
-        sh "docker-compose up -d --build"
+        sh '${DOCKER_COMPOSE_CMD} up -d --build'
       }
     }
 
