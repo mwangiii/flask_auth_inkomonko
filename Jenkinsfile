@@ -7,6 +7,7 @@ pipeline {
   }
 
   stages {
+
     stage('Initial Cleanup') {
       when {
         branch 'main'
@@ -69,11 +70,21 @@ pipeline {
       steps {
         echo "Querying Prometheus for application health..."
         sh '''
+          echo "Checking Prometheus 'up' metrics..."
           RESPONSE=$(curl -s "${PROMETHEUS_HOST}/api/v1/query?query=up")
+          echo "$RESPONSE"
+
           echo "$RESPONSE" | grep '"value"' | grep '"1"' > /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Prometheus did not return expected 'up' value!"
+            exit 1
+          else
+            echo "Prometheus confirms services are UP."
+          fi
         '''
       }
     }
+
   }
 
   post {
