@@ -5,31 +5,31 @@ from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 import os
 
-# Create Flask app
-app = Flask(__name__)
+db = SQLAlchemy()
+jwt = JWTManager()
+migrate = Migrate()
 
-# Load DB config
-db_params = config()
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-    f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-)
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = '4f8b31dc8ee3437486e3424bcb2d6f0b'
-app.config['JWT_TOKEN_LOCATION'] = ['headers']
+def create_app():
+    app = Flask(__name__)
 
-# Init extensions
-db = SQLAlchemy(app)
-jwt = JWTManager(app)
-migrate = Migrate(app, db)
+    # Load DB config
+    db_params = config()
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        f"postgresql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+        f"@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+    )
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['JWT_SECRET_KEY'] = '4f8b31dc8ee3437486e3424bcb2d6f0b'
+    app.config['JWT_TOKEN_LOCATION'] = ['headers']
 
-# Import models and routes
-from app import models
-with app.app_context():
-    db.create_all()
+    # Initialize extensions
+    db.init_app(app)
+    jwt.init_app(app)
+    migrate.init_app(app, db)
 
-from app import routes
+    with app.app_context():
+        from app import models
+        db.create_all()
+        from app import routes  
 
-# Prometheus metrics 
-from prometheus_flask_exporter import PrometheusMetrics
-metrics = PrometheusMetrics(app)
+    return app
