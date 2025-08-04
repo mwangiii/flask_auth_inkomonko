@@ -11,52 +11,88 @@ pipeline {
     stage('Set Compose Command') {
       steps {
         script {
-          echo "Using: docker-compose"
-          env.DOCKER_COMPOSE_CMD = "echo docker-compose"
+          // Check if 'docker compose' works; fallback to 'docker-compose'
+          def result = sh(script: 'docker compose version > /dev/null 2>&1', returnStatus: true)
+          env.DOCKER_COMPOSE_CMD = (result == 0) ? 'docker compose' : 'docker-compose'
+          echo "Using: ${env.DOCKER_COMPOSE_CMD}"
         }
       }
     }
 
     stage('Initial Cleanup') {
+      when {
+        branch 'main'
+      }
       steps {
         echo "Cleaning up previous Docker containers..."
-        sh 'echo "[SKIPPED] docker-compose down --remove-orphans"'
-        sh 'echo "[SKIPPED] docker system prune -f -a --volumes"'
+        sh '''
+          ${DOCKER_COMPOSE_CMD} down --remove-orphans || true
+          docker system prune -f -a --volumes || true
+        '''
       }
     }
 
     stage('Clone') {
       steps {
         echo "Cloning repository..."
-        sh 'echo "[SKIPPED] git clone ..."'
+        checkout scm
       }
     }
 
     stage('Prepare .env File') {
+      when {
+        branch 'main'
+      }
       steps {
         echo "Renaming 'environments' to '.env'..."
-        sh 'echo "[SKIPPED] mv environments .env"'
+        sh '''
+          if [ -f environments ]; then
+            mv environments .env
+            echo ".env file prepared."
+          else
+            echo "environments file not found!"
+            exit 1
+          fi
+        '''
       }
     }
 
     stage('Tests (Skipped)') {
       steps {
         echo "Skipping tests for now..."
-        sh 'echo "[SKIPPED] test execution"'
+        sh 'echo "tests would run here"'
       }
     }
 
     stage('Build and Start with Docker Compose') {
+      when {
+        branch 'main'
+      }
       steps {
         echo "Building and starting containers with Docker Compose..."
-        sh 'echo "[SKIPPED] docker-compose up -d --build"'
+        sh '${DOCKER_COMPOSE_CMD} up -d --build'
       }
     }
 
     stage('Prometheus Health Check') {
+      when {
+        branch 'main'
+      }
       steps {
         echo "Querying Prometheus for application health..."
-        sh 'echo "[SKIPPED] curl to Prometheus and check status"'
+        sh '''
+          echo "Checking Prometheus 'up' metrics..."
+          RESPONSE=$(curl -s "${PROMETHEUS_HOST}/api/v1/query?query=up")
+          echo "$RESPONSE"
+
+          echo "$RESPONSE" | grep '"value"' | grep '"1"' > /dev/null
+          if [ $? -ne 0 ]; then
+            echo "Prometheus did not return expected 'up' value!"
+            exit 1
+          else
+            echo "Prometheus confirms services are UP."
+          fi
+        '''
       }
     }
 
