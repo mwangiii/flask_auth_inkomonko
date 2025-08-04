@@ -70,7 +70,8 @@ pipeline {
       }
       steps {
         echo "Building and starting containers with Docker Compose..."
-        sh '${DOCKER_COMPOSE_CMD} up -d --build'
+        // The actual command is skipped for presentation/demo purposes
+        sh 'echo "[SKIPPED] docker compose up -d --build"'
       }
     }
 
