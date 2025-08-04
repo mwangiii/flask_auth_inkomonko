@@ -410,5 +410,3 @@ def add_user_to_organization(orgId):
             "message": "Failed to add user to organization",
             "error": str(e)
         }), 500
-if __name__ == '__main__':
-    app.run()
